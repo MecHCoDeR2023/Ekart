@@ -21,19 +21,27 @@ public class MyAccessDeniedHandler implements AccessDeniedHandler {
 
     private static Logger logger = LoggerFactory.getLogger(MyAccessDeniedHandler.class);
 
+    // Define the delay in milliseconds (e.g., 5 seconds)
+    private static final int API_DELAY_MS = 5000;
+
     @Override
     public void handle(HttpServletRequest httpServletRequest,
                        HttpServletResponse httpServletResponse,
                        AccessDeniedException e) throws IOException, ServletException {
 
-        Authentication auth
-                = SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null) {
             logger.info(String.format("User '%s' attempted to access the protected URL: %s", auth.getName(), httpServletRequest.getRequestURI()));
         }
 
-        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/403");
+        // Introduce an API delay
+        try {
+            Thread.sleep(API_DELAY_MS);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
 
+        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/403");
     }
 }
